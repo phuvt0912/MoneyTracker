@@ -11,6 +11,6 @@ data class TransactionEntity(
     val id: Int = 0,
     val fromUser: String,
     val content: String,
-    val time: Date,
+    val time: Long,
     val amount: Double
 )

@@ -4,8 +4,8 @@ import kotlinx.coroutines.flow.Flow
 
 class TransactionRepo(private val transactionDao: TransactionDAO) {
 
-    fun getTransactionByDate(timestamp: Long): Flow<List<TransactionEntity>> {
-        return transactionDao.getTransactionByDate(timestamp)
+    fun getTransactionByDate(start: Long, end: Long): Flow<List<TransactionEntity>> {
+        return transactionDao.getTransactionByDate(start, end)
     }
 
     suspend fun insert(transaction: TransactionEntity) {

@@ -7,6 +7,5 @@ class TransactionItem(
     var fromUser: String,
     var content: String,
     var time: String,
-    var transactionType: Boolean, //true là thu, false là chi
     var amount: String
 )

@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 class TransactionViewModel(private val repo: TransactionRepo): ViewModel() {
 
-    fun getTransactionByDate(timestamp: Long): LiveData<List<TransactionEntity>> {
-        return repo.getTransactionByDate(timestamp).asLiveData()
+    fun getTransactionByDate(start: Long, end: Long): LiveData<List<TransactionEntity>> {
+        return repo.getTransactionByDate(start, end).asLiveData()
     }
 
     fun insert(transaction: TransactionEntity) = viewModelScope.launch {

@@ -11,6 +11,6 @@ interface TransactionDAO {
     @Insert
     suspend fun insert(transaction: TransactionEntity)
 
-    @Query("SELECT * FROM transactions WHERE time = :timestamp ORDER BY time DESC")
-    fun getTransactionByDate(timestamp: Long): Flow<List<TransactionEntity>>
+    @Query("SELECT * FROM transactions WHERE time BETWEEN :start AND :end ORDER BY time DESC")
+    fun getTransactionByDate(start: Long, end: Long): Flow<List<TransactionEntity>>
 }
