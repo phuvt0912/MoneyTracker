@@ -24,8 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Notification Listener Service
+        <!-- Service -->
         <service
             android:name=".BankNotificationService"
             android:label="MoneyTrackerService"
@@ -34,9 +33,6 @@
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService"/>
             </intent-filter>
-        </service>-->
-
-
+        </service>
     </application>
-
 </manifest>

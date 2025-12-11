@@ -1,6 +1,9 @@
 package com.example.accountingapp
 
+import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +21,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -26,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     var transactions: MutableList<TransactionItem> = mutableListOf()
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: Adapter
+    private lateinit var DatePicker: ImageButton
     private lateinit var dateTextView: TextView
     //Tạo model view
     private val transactionviewmodel: TransactionViewModel by viewModels {
@@ -39,18 +44,47 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        if(!Helper.isNotificationServiceEnabled(this, BankNotificationService::class.java)) {
+            Helper.openNotificationAccessSettings(this)
+        }
         dateTextView = findViewById<TextView>(R.id.date)
         recyclerView = findViewById(R.id.transactions_recyclerview)
+        DatePicker = findViewById(R.id.DatePicker)
 
-        val datestr: String = dateTextView.text.toString()
-        loadTransactions(transactions, datestr)
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val today = "${String.format("%02d", day)}/${String.format("%02d", month + 1)}/$year"
+        dateTextView.text = today
 
         adapter = Adapter(transactions)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        Log.d("DEBUG", "adapter")
 
+        loadTransactions( today)
+        DatePicker.setOnClickListener{
+            val datepicker = DatePickerDialog(
+                this,
+                { _, selectedYear, selectedMonth, selectedDayOfMonth ->
+                    // 2. Định dạng lại ngày tháng đã chọn thành chuỗi "dd/MM/yyyy"
+                    val selectedDate = "${String.format("%02d", selectedDayOfMonth)}/${String.format("%02d", selectedMonth + 1)}/$selectedYear"
 
-        //Load data từ cơ sở dữ liệu
+                    // 3. Cập nhật TextView với ngày mới
+                    dateTextView.text = selectedDate
+
+                    // 4. Tải lại danh sách giao dịch cho ngày mới được chọn
+                    loadTransactions(selectedDate)
+                },
+                // Các giá trị ban đầu để hiển thị trên DatePicker
+                year,
+                month,
+                day
+            )
+            datepicker.show()
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -70,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         return Pair(start, end)
     }
 
-    private fun loadTransactions(transactions: MutableList<TransactionItem>, dateStr: String) {
+    private fun loadTransactions(dateStr: String) {
         val (start, end) = getStartAndEnd(dateStr)
         //Load từ db vào transaction
         transactionviewmodel.getTransactionByDate(start, end).observe(this) { TransactionDatas ->
@@ -86,6 +120,7 @@ class MainActivity : AppCompatActivity() {
                 transactions.add(newItem)
             }
             adapter.notifyDataSetChanged()
+            Log.d("DEBUG", "Transactions: $transactions")
         }
     }
 }
