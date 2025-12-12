@@ -8,10 +8,25 @@ import com.example.accountingapp.Database.TransactionEntity
 import com.example.accountingapp.Database.TransactionRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Intent
 
 
+private const val NOTIFICATION_ID = 101
+private const val CHANNEL_ID = "BankTrackingChannel"
+private const val CHANNEL_NAME = "Theo dõi giao dịch ngân hàng"
 class BankNotificationService: NotificationListenerService() {
+
+    // 1. Quản lý CoroutineScope
+    private val serviceJob = Job()
+    private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob) // Dùng Dispatchers.IO cho Database
+
+    // ... (Phần repo giữ nguyên)
     private val repo by lazy {
         val db = AppDatabase.getDatabase(this)
         TransactionRepo(db.transactionDao())
@@ -19,21 +34,73 @@ class BankNotificationService: NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
-        Log.d("DEBUG", "onNotificationPosted")
-        //if (!Helper.isBankNotification(sbn)) return
-        val (title, text) = Helper.extractNotificationText(sbn)
-        val amount = Helper.parseAmount(text)
 
-        val newTransaction = TransactionEntity(
-            fromUser = title,
-            content = text,
-            time = System.currentTimeMillis(),
-            amount = amount.toDouble()
-        )
-        //Do phải được gọi bằng hàm suspend nhưng ở đây k có nên phải thông qua CoroutineScope
-        CoroutineScope(Dispatchers.IO).launch{
-            repo.insert(newTransaction)
-            Log.d("DEBUG", "Inserted transaction time: ${System.currentTimeMillis()}")
+        // 2. Kiểm tra Null và Bank App
+        sbn?.let { notification ->
+            if (!Helper.isBankNotification(notification)){
+                Log.d("DEBUG", "Not a bank")
+                return
+            }
+
+            // 3. Thực hiện Parsing và Database Insert
+            val (title, text) = Helper.extractNotificationText(notification)
+            val amount = Helper.parseAmount(text)
+            val content = Helper.parseTransactionNote(text)
+            val bank = Helper.getBankName(sbn?.packageName.toString())
+            val newTransaction = TransactionEntity(
+                fromUser = bank,
+                // Gán nội dung thông báo đầy đủ vào đây để dễ debug
+                content = content,
+                time = System.currentTimeMillis(),
+                amount = amount.toDouble()
+            )
+
+            serviceScope.launch{
+                try {
+                    repo.insert(newTransaction)
+                    Log.d("DEBUG", "Inserted transaction successfully")
+                } catch (e: Exception) {
+                    Log.e("DEBUG", "Error inserting transaction: ${e.message}")
+                }
+            }
+        }
+    }
+
+    // 4. Hủy Scope khi Service bị hủy
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceJob.cancel()
+    }
+    override fun onCreate() {
+        super.onCreate()
+        // 1. Tạo Kênh thông báo (Bắt buộc từ Android O trở lên)
+        createNotificationChannel()
+
+        // 2. Xây dựng Thông báo cho Foreground
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Money Tracker đang hoạt động")
+            .setContentText("Đang theo dõi thông báo ngân hàng để ghi lại giao dịch.")
+            // Yêu cầu một icon nhỏ (small icon)
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // Thay thế bằng icon thực tế của bạn
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+
+        // 3. Khởi chạy Foreground Service
+        startForeground(NOTIFICATION_ID, notification)
+    }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY // Rất quan trọng: Yêu cầu hệ thống cố gắng khởi động lại Service
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val serviceChannel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_LOW
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(serviceChannel)
         }
     }
 }

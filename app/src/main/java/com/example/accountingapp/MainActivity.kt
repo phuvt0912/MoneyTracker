@@ -1,6 +1,8 @@
 package com.example.accountingapp
 
 import android.app.DatePickerDialog
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
@@ -16,13 +18,12 @@ import com.example.accountingapp.Database.TransactionRepo
 import com.example.accountingapp.Database.TransactionViewModel
 import com.example.accountingapp.Database.TransactionViewModelFactory
 import androidx.activity.viewModels
-import com.example.accountingapp.Database.TransactionEntity
+import android.widget.Toast
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: Adapter
     private lateinit var DatePicker: ImageButton
     private lateinit var dateTextView: TextView
+    private lateinit var totalTextView: TextView
+
     //Tạo model view
     private val transactionviewmodel: TransactionViewModel by viewModels {
         //Tạo db, tạo DAO, tạo VMFactory
@@ -44,10 +47,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        if(!Helper.isNotificationServiceEnabled(this, BankNotificationService::class.java)) {
-            Helper.openNotificationAccessSettings(this)
-        }
         dateTextView = findViewById<TextView>(R.id.date)
+        totalTextView = findViewById<TextView>(R.id.TotalTextview)
         recyclerView = findViewById(R.id.transactions_recyclerview)
         DatePicker = findViewById(R.id.DatePicker)
 
@@ -65,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("DEBUG", "adapter")
 
         loadTransactions( today)
+
         DatePicker.setOnClickListener{
             val datepicker = DatePickerDialog(
                 this,
@@ -114,13 +116,54 @@ class MainActivity : AppCompatActivity() {
                     entity.id,
                     entity.fromUser,
                     entity.content,
-                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(entity.time),
-                    entity.amount.toString()
+                    SimpleDateFormat("HH:mm", Locale.getDefault()).format(entity.time),
+                    entity.amount.toString() + "VNĐ"
                 )
                 transactions.add(newItem)
             }
             adapter.notifyDataSetChanged()
+            calculateTotal()
             Log.d("DEBUG", "Transactions: $transactions")
+        }
+    }
+
+    private fun calculateTotal() {
+        var total: Double = 0.0
+        for (item in transactions) {
+            val amount = item.amount.replace("VNĐ", "").trim().toDoubleOrNull() ?: 0.0
+            total += amount
+        }
+        totalTextView.text = total.toString() + "VNĐ"
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+
+        // 1. Kiểm tra Quyền Notification Access
+        if (!Helper.isNotificationServiceEnabled(this, BankNotificationService::class.java)) {
+            // Nếu chưa bật, yêu cầu người dùng bật
+            Helper.openNotificationAccessSettings(this)
+            Toast.makeText(this, "Vui lòng bật quyền truy cập thông báo để ứng dụng hoạt động.", Toast.LENGTH_LONG).show()
+        } else {
+            // 2. Quyền đã được cấp. Khởi động Foreground Service.
+
+            // Tạo Intent để khởi động BankNotificationService
+            val serviceIntent = Intent(this, BankNotificationService::class.java)
+
+            // Trên Android Oreo (API 26) trở lên, bạn phải dùng startForegroundService()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent)
+                Log.d("SERVICE", "Starting Foreground Service (API 26+)")
+            } else {
+                startService(serviceIntent)
+                Log.d("SERVICE", "Starting Service (pre-API 26)")
+            }
+
+            // Tùy chọn: Dùng toggleService để ép hệ thống bind lại nếu cần (thường chỉ cần startService là đủ)
+            // Helper.toggleNotificationListenerService(this)
+
+            Toast.makeText(this, "Service đã được khởi động.", Toast.LENGTH_SHORT).show()
         }
     }
 }
