@@ -1,17 +1,17 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    // Thêm plugin KSP
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.example.accountingapp"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36 // Bạn đã có sẵn, chỉ để tham khảo
 
     defaultConfig {
         applicationId = "com.example.accountingapp"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -43,6 +43,17 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
+    // === CÁC DEPENDENCY CỦA ROOM ===
+    // Thư viện runtime chính của Room
+    implementation(libs.androidx.room.runtime)
+    // Hỗ trợ Kotlin Extensions và Coroutines cho Room. [2]
+    implementation(libs.androidx.room.ktx)
+    // Annotation processor cho Room, sử dụng ksp. [2, 9]
+    ksp(libs.androidx.room.compiler)
+    // ================================
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3") // Thêm dòng này
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

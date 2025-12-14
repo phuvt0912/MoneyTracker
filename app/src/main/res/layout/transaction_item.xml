@@ -15,7 +15,7 @@
         android:layout_marginEnd="8dp">
 
         <TextView
-            android:id="@+id/item_name_textview"
+            android:id="@+id/userTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
@@ -23,7 +23,7 @@
             tools:text="Cà phê Highland" />
 
         <TextView
-            android:id="@+id/item_note_textview"
+            android:id="@+id/contentTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -33,7 +33,7 @@
             tools:text="Mời bạn bè, chi nhánh Nguyễn Văn Cừ" />
 
         <TextView
-            android:id="@+id/item_date_textview"
+            android:id="@+id/timeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -43,7 +43,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/item_amount_textview"
+        android:id="@+id/amountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
