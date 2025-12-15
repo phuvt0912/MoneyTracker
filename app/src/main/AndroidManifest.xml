@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Cho phép service chạy lại khi khởi động -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -14,14 +15,19 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
+        android:label="MoneyTracker"
         android:allowBackup="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AccountingApp">
+        android:theme="@style/Theme.AccountingApp"
+        android:icon="@mipmap/ic_launcher"
+         >
 
         <!-- Main activity -->
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
