@@ -5,7 +5,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="16dp"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:background="@drawable/rounded_corners_item"
+    android:layout_margin="8dp">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -46,7 +48,7 @@
         android:id="@+id/amountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
+        android:textColor="@color/DarkGreen"
         android:textSize="18sp"
         android:textStyle="bold"
         tools:text="-59.000 đ" />
