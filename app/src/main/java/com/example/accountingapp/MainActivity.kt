@@ -34,6 +34,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var DatePicker: ImageButton
     private lateinit var dateTextView: TextView
     private lateinit var totalTextView: TextView
+    private lateinit var dayDateTextView: TextView
+
+    private fun getDayOfWeek(calendar: Calendar): String {
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) ;   return when (dayOfWeek) {
+            Calendar.SUNDAY -> "Chủ nhật"
+            Calendar.MONDAY -> "Thứ hai"
+            Calendar.TUESDAY -> "Thứ ba"
+            Calendar.WEDNESDAY -> "Thứ tư"
+            Calendar.THURSDAY -> "Thứ năm"
+            Calendar.FRIDAY -> "Thứ sáu"
+            Calendar.SATURDAY -> "Thứ bảy"
+            else -> ""
+        }
+    }
 
     //Tạo model view
     private val transactionviewmodel: TransactionViewModel by viewModels {
@@ -51,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         totalTextView = findViewById<TextView>(R.id.TotalTextview)
         recyclerView = findViewById(R.id.transactions_recyclerview)
         DatePicker = findViewById(R.id.DatePicker)
+        dayDateTextView = findViewById(R.id.day_date)
 
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -59,6 +74,8 @@ class MainActivity : AppCompatActivity() {
 
         val today = "${String.format("%02d", day)}/${String.format("%02d", month + 1)}/$year"
         dateTextView.text = today
+        dayDateTextView.text = getDayOfWeek(calendar)
+
 
         adapter = Adapter(transactions)
         recyclerView.adapter = adapter
@@ -68,14 +85,19 @@ class MainActivity : AppCompatActivity() {
         loadTransactions( today)
 
         DatePicker.setOnClickListener{
+
+
             val datepicker = DatePickerDialog(
                 this,
                 { _, selectedYear, selectedMonth, selectedDayOfMonth ->
                     // 2. Định dạng lại ngày tháng đã chọn thành chuỗi "dd/MM/yyyy"
                     val selectedDate = "${String.format("%02d", selectedDayOfMonth)}/${String.format("%02d", selectedMonth + 1)}/$selectedYear"
+                    var selectedCalendar = Calendar.getInstance()
+                    selectedCalendar.set(selectedYear, selectedMonth, selectedDayOfMonth)
 
                     // 3. Cập nhật TextView với ngày mới
                     dateTextView.text = selectedDate
+                    dayDateTextView.text = getDayOfWeek(selectedCalendar)
 
                     // 4. Tải lại danh sách giao dịch cho ngày mới được chọn
                     loadTransactions(selectedDate)
