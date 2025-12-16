@@ -26,43 +26,43 @@
             android:src="@drawable/ic_calendar"
             android:scaleType="fitXY"/>
 
+        <!-- Phần ngày tháng ở giữa -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingLeft="95dp">
+            android:gravity="center">
+
             <TextView
                 android:id="@+id/day_date"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-
                 android:text="Thứ hai"
                 android:textColor="@color/white"
-                android:textSize="24sp"
-                tools:ignore="NestedWeights" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/date"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-
                 android:text="07/12/2025"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                tools:ignore="NestedWeights" />
+                android:textSize="18sp" />
         </LinearLayout>
 
-        <!-- TextView ngày tháng ở giữa, chiếm hết không gian còn lại -->
-
-
+        <!-- Icon nút góc phải (mới thêm) -->
+        <ImageButton
+            android:id="@+id/btn_guide"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Menu"
+            android:src="@drawable/questionmark"
+            android:scaleType="centerInside"/>
     </LinearLayout>
 
     <TextView
-
         android:id="@+id/TotalTextview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -73,9 +73,7 @@
         android:text="1.000.000 đ"
         android:textColor="@color/white"
         android:textSize="34sp"
-        android:textStyle="bold"
-
-        />
+        android:textStyle="bold"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/transactions_recyclerview"

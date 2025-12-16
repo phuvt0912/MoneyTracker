@@ -1,11 +1,14 @@
 package com.example.accountingapp
 
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +22,7 @@ import com.example.accountingapp.Database.TransactionViewModel
 import com.example.accountingapp.Database.TransactionViewModelFactory
 import androidx.activity.viewModels
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -35,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dateTextView: TextView
     private lateinit var totalTextView: TextView
     private lateinit var dayDateTextView: TextView
+    private lateinit var guideButton: ImageButton
 
     private fun getDayOfWeek(calendar: Calendar): String {
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) ;   return when (dayOfWeek) {
@@ -63,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         dateTextView = findViewById<TextView>(R.id.date)
         totalTextView = findViewById<TextView>(R.id.TotalTextview)
+        guideButton = findViewById(R.id.btn_guide)
         recyclerView = findViewById(R.id.transactions_recyclerview)
         DatePicker = findViewById(R.id.DatePicker)
         dayDateTextView = findViewById(R.id.day_date)
@@ -110,6 +116,20 @@ class MainActivity : AppCompatActivity() {
             datepicker.show()
         }
 
+        guideButton.setOnClickListener {
+            val dialog = Dialog(this)
+            dialog.setContentView(R.layout.credit_popup)
+            dialog.setCancelable(true)
+            val popupText = dialog.findViewById<TextView>(R.id.popup_text)
+            popupText.movementMethod = LinkMovementMethod.getInstance()
+
+            val gif = dialog.findViewById<ImageView>(R.id.popup_gif)
+            Glide.with(this)
+                .asGif()
+                .load(R.drawable.moneyga)
+                .into(gif)
+            dialog.show()
+        }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">AccountingApp</string>
+    <string name="guide_text">
+        Đây là ứng dụng được lập trình bởi sinh viên Pham Sỹ Phú và Nguyễn Tuấn Hưng\n
+        \n
+        Đây là ứng dụng đọc thông báo từ ngân hàng (hiện tại chỉ đang hỗ trợ chuyển đổi format ngân hàng MBBank)\n
+        \n
+        Vì thế cần phải để ứng dụng được quyền thông báo thì ứng dụng mới có thể hoạt động được\n
+        \n
+        Xin chân thành cảm ơn quý người dùng!\n
+        \n
+        Source code ở github: <a href="https://github.com/phuvt0912/MoneyTracker.git">MoneyTracker</a>
+    </string>
 </resources>
