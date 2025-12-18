@@ -182,30 +182,16 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        // 1. Kiểm tra Quyền Notification Access
         if (!Helper.isNotificationServiceEnabled(this, BankNotificationService::class.java)) {
-            // Nếu chưa bật, yêu cầu người dùng bật
             Helper.openNotificationAccessSettings(this)
-            Toast.makeText(this, "Vui lòng bật quyền truy cập thông báo để ứng dụng hoạt động.", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                "Vui lòng bật quyền truy cập thông báo để ứng dụng hoạt động.",
+                Toast.LENGTH_LONG
+            ).show()
         } else {
-            // 2. Quyền đã được cấp. Khởi động Foreground Service.
-
-            // Tạo Intent để khởi động BankNotificationService
-            val serviceIntent = Intent(this, BankNotificationService::class.java)
-
-            // Trên Android Oreo (API 26) trở lên, bạn phải dùng startForegroundService()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent)
-                Log.d("SERVICE", "Starting Foreground Service (API 26+)")
-            } else {
-                startService(serviceIntent)
-                Log.d("SERVICE", "Starting Service (pre-API 26)")
-            }
-
-            // Tùy chọn: Dùng toggleService để ép hệ thống bind lại nếu cần (thường chỉ cần startService là đủ)
-            // Helper.toggleNotificationListenerService(this)
-
-            Toast.makeText(this, "Service đã được khởi động.", Toast.LENGTH_SHORT).show()
+            Helper.toggleNotificationListenerService(this)
+            Log.d("NL_STATE", "NotificationListenerService rebind requested")
         }
     }
 }
