@@ -92,13 +92,6 @@ object Helper {
         return normalized.toLongOrNull() ?: 0L
     }
 
-    // =============================
-    // 5. Parse thu/chi
-    // =============================
-    fun parseTransactionType(text: String): String {
-        return if (text.contains("-")) "expense" else "income"
-    }
-
     fun toggleNotificationListenerService(context: Context) {
         try {
             val componentName = ComponentName(context, BankNotificationService::class.java)

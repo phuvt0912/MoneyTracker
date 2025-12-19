@@ -20,6 +20,9 @@ import android.content.Intent
 private const val NOTIFICATION_ID = 101
 private const val CHANNEL_ID = "BankTrackingChannel"
 private const val CHANNEL_NAME = "Theo dõi giao dịch ngân hàng"
+
+private val handledKeys = mutableSetOf<String>()
+
 class BankNotificationService: NotificationListenerService() {
 
     // 1. Quản lý CoroutineScope
@@ -43,10 +46,17 @@ class BankNotificationService: NotificationListenerService() {
             }
 
             // 3. Thực hiện Parsing và Database Insert
-            val (title, text) = Helper.extractNotificationText(notification)
+            val (title, text) = Helper.extractNotificationText(sbn)
             val amount = Helper.parseAmount(text)
             val content = Helper.parseTransactionNote(text)
-            val bank = Helper.getBankName(sbn?.packageName.toString())
+
+            if (amount <= 0 || content.isBlank()) return
+            if (handledKeys.contains(sbn.key)) return
+            handledKeys.add(sbn.key)
+
+            if (handledKeys.size > 100) handledKeys.clear()
+
+            val bank = Helper.getBankName(sbn.packageName.toString())
             val newTransaction = TransactionEntity(
                 fromUser = bank,
                 // Gán nội dung thông báo đầy đủ vào đây để dễ debug
