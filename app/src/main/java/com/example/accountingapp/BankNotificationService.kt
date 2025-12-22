@@ -90,8 +90,7 @@ class BankNotificationService: NotificationListenerService() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Money Tracker đang hoạt động")
             .setContentText("Đang theo dõi thông báo ngân hàng để ghi lại giao dịch.")
-            // Yêu cầu một icon nhỏ (small icon)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // Thay thế bằng icon thực tế của bạn
+            .setSmallIcon(R.drawable.icon)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
 
@@ -99,7 +98,7 @@ class BankNotificationService: NotificationListenerService() {
         startForeground(NOTIFICATION_ID, notification)
     }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_STICKY // Rất quan trọng: Yêu cầu hệ thống cố gắng khởi động lại Service
+        return START_STICKY
     }
 
     private fun createNotificationChannel() {
